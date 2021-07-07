@@ -16,7 +16,7 @@ StorageInterface.prototype.storeBook = function (book) {
   book.ID = this.getNextID();
   this.library.push(book);
   this.storage.setItem(`${book.ID}`, JSON.stringify(book));
-  const bookIDs = this.library.map(b => b.ID);
+  const bookIDs = this.library.map((b) => b.ID);
   this.storage.setItem("bookIDs", bookIDs.join());
 };
 
@@ -27,19 +27,30 @@ StorageInterface.prototype.getNextID = function () {
   return nextID;
 };
 
-StorageInterface.prototype.loadFromStorage = function() {
+StorageInterface.prototype.loadFromStorage = function () {
   const IDs = this.storage.getItem("bookIDs");
   if (IDs) {
     for (ID of IDs.split(",")) {
       console.log(`Loading book with ID ${ID}`);
-      const loadedBook = Object.assign(new Book(), JSON.parse(this.storage.getItem(`${ID}`)));
+      const loadedBook = Object.assign(
+        new Book(),
+        JSON.parse(this.storage.getItem(`${ID}`))
+      );
       this.library.push(loadedBook);
     }
   }
+};
 
-}
+StorageInterface.prototype.deleteBook = function (bookID) {
+  const bookIndex = this.library.map((b) => b.ID).indexOf(bookID);
+  if (bookIndex !== -1) {
+    this.library.splice(bookIndex, 1);
+    this.storage.removeItem(`${bookIndex}`);
+    const bookIDs = this.library.map((b) => b.ID);
+    this.storage.setItem("bookIDs", bookIDs.join());
+  }
+};
 
-//let myLibrary = [];
 ////////////////////////////////////////////////////////////////////////////////
 // Book
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,28 +62,28 @@ function Book(author, title, numberOfPages, completed) {
 }
 
 Book.prototype.getHTML = function () {
-const bookDiv = document.createElement("div");
-bookDiv.classList.add("book");
+  const bookDiv = document.createElement("div");
+  bookDiv.classList.add("book");
 
-const title = document.createElement("p");
-title.textContent = `${this.title}`;
-title.classList.add("title");
+  const title = document.createElement("p");
+  title.textContent = `${this.title}`;
+  title.classList.add("title");
 
-const author = document.createElement("p");
-author.textContent = `${this.author}`;
+  const author = document.createElement("p");
+  author.textContent = `${this.author}`;
 
-const numberOfPages = document.createElement("p");
-numberOfPages.textContent = `${this.numberOfPages}`;
+  const numberOfPages = document.createElement("p");
+  numberOfPages.textContent = `${this.numberOfPages}`;
 
-const completed = document.createElement("p");
-completed.textContent = this.completed ? "Finished" : "Not finished";
+  const completed = document.createElement("p");
+  completed.textContent = this.completed ? "Finished" : "Not finished";
 
-bookDiv.appendChild(title);
-bookDiv.appendChild(author);
-bookDiv.appendChild(numberOfPages);
-bookDiv.appendChild(completed);
+  bookDiv.appendChild(title);
+  bookDiv.appendChild(author);
+  bookDiv.appendChild(numberOfPages);
+  bookDiv.appendChild(completed);
 
-return bookDiv;
+  return bookDiv;
 };
 
 //const bookList = document.querySelector(".book-list");
@@ -138,9 +149,8 @@ return bookDiv;
 //const exampleBook2 = new Book("Isaac Asimov", "Foundations", 150, false);
 //s.storeBook(exampleBook2);
 
-
 let s = new StorageInterface(localStorage);
-
+s.deleteBook("3");
 
 //}
 
