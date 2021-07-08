@@ -17,6 +17,9 @@ StorageInterface.prototype.storeBook = function (book) {
   book.ID = this.getNextID();
   this.library.push(book);
   this.storage.setItem(`${book.ID}`, JSON.stringify(book));
+  // This prop assignment must come after saving to storage to avoid a
+  // cyclic object value when calling JSON.stringify()
+  book.storageInterface = this;
   const bookIDs = this.library.map((b) => b.ID);
   this.storage.setItem("bookIDs", bookIDs.join());
   this.renderBook(book);
@@ -39,6 +42,7 @@ StorageInterface.prototype.loadFromStorage = function () {
         JSON.parse(this.storage.getItem(`${ID}`))
       );
       this.library.push(loadedBook);
+      loadedBook.storageInterface = this;
       this.renderBook(loadedBook);
     }
   }
@@ -51,6 +55,8 @@ StorageInterface.prototype.deleteBook = function (bookID) {
     this.storage.removeItem(bookID.toString());
     const bookIDs = this.library.map((b) => b.ID);
     this.storage.setItem("bookIDs", bookIDs.join());
+    const bookDiv = document.querySelector(`[data-bookID="${bookID}"]`);
+    bookDiv.remove();
   }
 };
 
@@ -71,6 +77,14 @@ function Book(author, title, numberOfPages, completed) {
 Book.prototype.getHTML = function () {
   const bookDiv = document.createElement("div");
   bookDiv.classList.add("book");
+  bookDiv.setAttribute("data-bookID", `${this.ID}`);
+
+  const deleteButton = document.createElement("button");
+  deleteButton.setAttribute("type", "button");
+  deleteButton.textContent = "X";
+  deleteButton.addEventListener("click", () => {
+    this.storageInterface.deleteBook(this.ID);
+  });
 
   const title = document.createElement("p");
   title.textContent = `${this.title}`;
@@ -85,6 +99,7 @@ Book.prototype.getHTML = function () {
   const completed = document.createElement("p");
   completed.textContent = this.completed ? "Finished" : "Not finished";
 
+  bookDiv.appendChild(deleteButton);
   bookDiv.appendChild(title);
   bookDiv.appendChild(author);
   bookDiv.appendChild(numberOfPages);
