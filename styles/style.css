@@ -11,6 +11,12 @@
   font-style: italic;
 }
 
+#modal-wrapper {
+  border: 1px solid black;
+  padding: 15px;
+}
+
+/*
 #modal-wrapper.overlay::before {
   content: " ";
   width: 100%;
@@ -41,3 +47,4 @@
 #modal-wrapper.overlay #book-input-form {
   display: block;
 }
+*/

@@ -1,8 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Storage Interface
 ////////////////////////////////////////////////////////////////////////////////
-function StorageInterface(storage) {
+function StorageInterface(storage, bookListDiv) {
   this.storage = storage;
+  this.bookListDiv = bookListDiv;
   this.library = [];
 
   if (this.storage.getItem("nextID") === undefined) {
@@ -18,6 +19,7 @@ StorageInterface.prototype.storeBook = function (book) {
   this.storage.setItem(`${book.ID}`, JSON.stringify(book));
   const bookIDs = this.library.map((b) => b.ID);
   this.storage.setItem("bookIDs", bookIDs.join());
+  this.renderBook(book);
 };
 
 // Returns next ID. Increments nextID counter in storage
@@ -37,18 +39,23 @@ StorageInterface.prototype.loadFromStorage = function () {
         JSON.parse(this.storage.getItem(`${ID}`))
       );
       this.library.push(loadedBook);
+      this.renderBook(loadedBook);
     }
   }
 };
 
 StorageInterface.prototype.deleteBook = function (bookID) {
-  const bookIndex = this.library.map(b => b.ID).indexOf(bookID.toString());
+  const bookIndex = this.library.map((b) => b.ID).indexOf(bookID.toString());
   if (bookIndex !== -1) {
     this.library.splice(bookIndex, 1);
     this.storage.removeItem(bookID.toString());
     const bookIDs = this.library.map((b) => b.ID);
     this.storage.setItem("bookIDs", bookIDs.join());
   }
+};
+
+StorageInterface.prototype.renderBook = function (book) {
+  this.bookListDiv.appendChild(book.getHTML());
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,11 +93,28 @@ Book.prototype.getHTML = function () {
   return bookDiv;
 };
 
-//const bookList = document.querySelector(".book-list");
-//function addBookToLibrary(book) {
-//myLibrary.push(book);
-//bookList.appendChild(book.getHTML());
-//}
+////////////////////////////////////////////////////////////////////////////////
+// UI
+////////////////////////////////////////////////////////////////////////////////
+const bookList = document.querySelector("#book-list");
+const submitBookButton = document.querySelector("#submit-book-button");
+submitBookButton.addEventListener("click", submitBook);
+
+const titleInput = document.querySelector("#title-input");
+const authorInput = document.querySelector("#author-input");
+const pagesInput = document.querySelector("#number-of-pages-input");
+const completedInput = document.querySelector("#completed-input");
+function submitBook() {
+  const newTitle = titleInput.value;
+  const newAuthor = authorInput.value;
+  const newPages = pagesInput.value;
+  const newCompleted = completedInput.value;
+
+  const newBook = new Book(newAuthor, newTitle, newPages, newCompleted);
+  s.storeBook(newBook);
+}
+
+let s = new StorageInterface(localStorage, bookList);
 
 //const modal_init = function () {
 //const modalWrapper = document.querySelector("#modal-wrapper");
@@ -127,16 +151,6 @@ Book.prototype.getHTML = function () {
 ////document.addEventListener("click", clickHandler);
 //};
 
-//const titleInput = document.querySelector("#title-input");
-//const authorInput = document.querySelector("#author-input");
-//const pageTotalInput = document.querySelector("#number-of-pages-input");
-//const completedInput = document.querySelector("#completed-input");
-//function submitNewBook() {
-//const newTitle = titleInput.value;
-//const newAuthor = authorInput.value;
-//const newPages = pageTotalInput.value;
-//const newCompleted = completedInput.checked;
-
 //const newBook = new Book(newAuthor, newTitle, newPages, newCompleted);
 //addBookToLibrary(newBook);
 //}
@@ -144,7 +158,6 @@ Book.prototype.getHTML = function () {
 //function main() {
 //modal_init();
 
-let s = new StorageInterface(localStorage);
 //const exampleBook1 = new Book("Ray Bradbury", "Fahrenheit 451", 212, true);
 //s.storeBook(exampleBook1);
 //const exampleBook2 = new Book("Isaac Asimov", "Foundations", 150, false);
@@ -152,7 +165,6 @@ let s = new StorageInterface(localStorage);
 //const exampleBook3 = new Book("Shel Silverstein", "Where the Sidewalk Ends", 149, false);
 //s.storeBook(exampleBook3);
 
-s.deleteBook("3");
 //}
 
 //main();
