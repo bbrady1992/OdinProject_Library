@@ -42,10 +42,10 @@ StorageInterface.prototype.loadFromStorage = function () {
 };
 
 StorageInterface.prototype.deleteBook = function (bookID) {
-  const bookIndex = this.library.map((b) => b.ID).indexOf(bookID);
+  const bookIndex = this.library.map(b => b.ID).indexOf(bookID.toString());
   if (bookIndex !== -1) {
     this.library.splice(bookIndex, 1);
-    this.storage.removeItem(`${bookIndex}`);
+    this.storage.removeItem(bookID.toString());
     const bookIDs = this.library.map((b) => b.ID);
     this.storage.setItem("bookIDs", bookIDs.join());
   }
@@ -144,14 +144,15 @@ Book.prototype.getHTML = function () {
 //function main() {
 //modal_init();
 
+let s = new StorageInterface(localStorage);
 //const exampleBook1 = new Book("Ray Bradbury", "Fahrenheit 451", 212, true);
 //s.storeBook(exampleBook1);
 //const exampleBook2 = new Book("Isaac Asimov", "Foundations", 150, false);
 //s.storeBook(exampleBook2);
+//const exampleBook3 = new Book("Shel Silverstein", "Where the Sidewalk Ends", 149, false);
+//s.storeBook(exampleBook3);
 
-let s = new StorageInterface(localStorage);
 s.deleteBook("3");
-
 //}
 
 //main();
