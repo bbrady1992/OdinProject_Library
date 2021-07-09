@@ -11,6 +11,46 @@
   font-style: italic;
 }
 
+.toolbar {
+  background-color: #002984;
+  width: 100vw;
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.content {
+  position: relative;
+  top: 80px;
+}
+
+#add-book-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.hoverable-button {
+  border: none;
+  background-color: #3f50b5;
+  transition: 0.2s;
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 5px 5px 0px;
+}
+
+.hoverable-button:hover {
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 10px 10px 0px;
+  transform: translatey(-5px);
+  cursor: pointer;
+}
+
 #modal-wrapper.overlay::before {
   content: " ";
   width: 100%;

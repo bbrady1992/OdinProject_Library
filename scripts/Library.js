@@ -96,12 +96,14 @@ Book.prototype.getHTML = function () {
   const deleteButton = document.createElement("button");
   deleteButton.setAttribute("type", "button");
   deleteButton.textContent = "X";
+  deleteButton.classList.add("hoverable-button");
   deleteButton.addEventListener("click", () => {
     this.storageInterface.deleteBook(this.ID);
   });
 
   const toggleReadStatusButton = document.createElement("button");
   toggleReadStatusButton.textContent = "Toggle Read Status";
+  toggleReadStatusButton.classList.add("hoverable-button");
 
   const title = document.createElement("p");
   title.textContent = `${this.title}`;
