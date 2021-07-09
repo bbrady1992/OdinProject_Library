@@ -93,10 +93,13 @@ Book.prototype.getHTML = function () {
   bookDiv.classList.add("book");
   bookDiv.setAttribute("data-bookID", `${this.ID}`);
 
+
+
   const deleteButton = document.createElement("button");
   deleteButton.setAttribute("type", "button");
   deleteButton.textContent = "X";
   deleteButton.classList.add("hoverable-button");
+  deleteButton.classList.add("light-hoverable-button");
   deleteButton.addEventListener("click", () => {
     this.storageInterface.deleteBook(this.ID);
   });
@@ -104,6 +107,12 @@ Book.prototype.getHTML = function () {
   const toggleReadStatusButton = document.createElement("button");
   toggleReadStatusButton.textContent = "Toggle Read Status";
   toggleReadStatusButton.classList.add("hoverable-button");
+  toggleReadStatusButton.classList.add("light-hoverable-button");
+
+  const controlDiv = document.createElement("div");
+  controlDiv.classList.add("book-controls");
+  controlDiv.appendChild(deleteButton);
+  controlDiv.appendChild(toggleReadStatusButton);
 
   const title = document.createElement("p");
   title.textContent = `${this.title}`;
@@ -124,8 +133,7 @@ Book.prototype.getHTML = function () {
     this.storageInterface.updateBook(this);
   });
 
-  bookDiv.appendChild(deleteButton);
-  bookDiv.appendChild(toggleReadStatusButton);
+  bookDiv.appendChild(controlDiv);
   bookDiv.appendChild(title);
   bookDiv.appendChild(author);
   bookDiv.appendChild(numberOfPages);
