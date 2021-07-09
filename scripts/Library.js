@@ -64,6 +64,20 @@ StorageInterface.prototype.renderBook = function (book) {
   this.bookListDiv.appendChild(book.getHTML());
 };
 
+StorageInterface.prototype.updateBook = function (book) {
+  const bookIndex = this.library.map((b) => b.ID).indexOf(book.ID.toString());
+  if (bookIndex !== -1) {
+    this.library[bookIndex] = book;
+    // Janky workaround to avoid cyclic reference. Probably should have a
+    // proper serialization method for Book, but this works
+    delete book.storageInterface;
+    this.storage.setItem(`${book.ID}`, JSON.stringify(book));
+    // This prop assignment must come after saving to storage to avoid a
+    // cyclic object value when calling JSON.stringify()
+    book.storageInterface = this;
+  }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Book
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,6 +119,7 @@ Book.prototype.getHTML = function () {
   toggleReadStatusButton.addEventListener("click", () => {
     this.completed = !this.completed;
     completed.textContent = this.completed ? "Finished" : "Not finished";
+    this.storageInterface.updateBook(this);
   });
 
   bookDiv.appendChild(deleteButton);
@@ -129,7 +144,11 @@ const authorInput = document.querySelector("#author-input");
 const pagesInput = document.querySelector("#number-of-pages-input");
 const completedInput = document.querySelector("#completed-input");
 const closeInputFormButton = document.querySelector("#close-book-input-form");
+const bookInputForm = document.querySelector("#book-input-form");
 function submitBook() {
+  if (!bookInputForm.checkValidity()) {
+    return false;
+  }
   const newTitle = titleInput.value;
   const newAuthor = authorInput.value;
   const newPages = pagesInput.value;
@@ -142,12 +161,11 @@ function submitBook() {
   pagesInput.value = "";
   completedInput.checked = false;
   closeInputFormButton.click();
+  return false;
 }
-
 
 const modal_init = function () {
   const modalWrapper = document.querySelector("#modal-wrapper");
-  const bookInputForm = document.querySelector("#book-input-form");
 
   const openModal = function (e) {
     console.log("Opening modal");
@@ -175,7 +193,7 @@ const modal_init = function () {
     e.stopPropagation();
   });
   document.addEventListener("keydown", escapeKeyHandler, false);
-  closeInputFormButton.addEventListener('click', closeModal);
+  closeInputFormButton.addEventListener("click", closeModal);
   //document.addEventListener("click", clickHandler);
 };
 
