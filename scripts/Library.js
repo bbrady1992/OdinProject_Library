@@ -86,6 +86,9 @@ Book.prototype.getHTML = function () {
     this.storageInterface.deleteBook(this.ID);
   });
 
+  const toggleReadStatusButton = document.createElement("button");
+  toggleReadStatusButton.textContent = "Toggle Read Status";
+
   const title = document.createElement("p");
   title.textContent = `${this.title}`;
   title.classList.add("title");
@@ -99,7 +102,13 @@ Book.prototype.getHTML = function () {
   const completed = document.createElement("p");
   completed.textContent = this.completed ? "Finished" : "Not finished";
 
+  toggleReadStatusButton.addEventListener('click', () => {
+    this.completed = !this.completed;
+    completed.textContent = this.completed ? "Finished" : "Not finished";
+  });
+
   bookDiv.appendChild(deleteButton);
+  bookDiv.appendChild(toggleReadStatusButton);
   bookDiv.appendChild(title);
   bookDiv.appendChild(author);
   bookDiv.appendChild(numberOfPages);
@@ -123,10 +132,14 @@ function submitBook() {
   const newTitle = titleInput.value;
   const newAuthor = authorInput.value;
   const newPages = pagesInput.value;
-  const newCompleted = completedInput.value;
+  const newCompleted = completedInput.checked;
 
   const newBook = new Book(newAuthor, newTitle, newPages, newCompleted);
   s.storeBook(newBook);
+  titleInput.value = "";
+  authorInput.value = "";
+  pagesInput.value = "";
+  completedInput.checked = false;
 }
 
 let s = new StorageInterface(localStorage, bookList);
